@@ -1,0 +1,90 @@
+<section class=" flex  m-5 h-full w-full overflow-hidden">
+    <!-- Tool box-->
+    <div class="w-18 border">
+        <span class="text-sm"> Tool Box</span>
+        <button class="border-t flex flex-col items-center justify-center p-2" (click)="toggle()">
+            <img class="w-8" src="./assets/icons/shapes.png" alt="shapes">
+            <span class="text-xs">Shapes</span>
+        </button>
+        <button class="border-t flex flex-col items-center justify-center p-2" (click)="toggleImage()">
+          <img class="w-8" src="./assets/icons/picture.png" alt="images">
+          <span class="text-xs">Images</span>
+        </button>
+        <button class="border-t flex flex-col items-center justify-center p-2" (click)="createShape('text')">
+          <img class="w-8" src="./assets/icons/text.png" alt="text">
+          <span class="text-xs">Text</span>
+        </button>
+        <button class=" border-b border-t flex flex-col items-center justify-center p-2" (click)="createShape('pen')">
+          <img class="w-8" src="./assets/icons/pencil.png" alt="pencil">
+          <span class="text-xs">Draw</span>
+        </button>
+        <button class=" border-b border-t flex flex-col items-center justify-center p-2" (click)="createShape('erase')">
+          <img class="w-8" src="./assets/icons/eraser.png" alt="eraser">
+          <span class="text-xs">Eraser</span>
+        </button>
+
+         <!-- color pane  -->
+        <div class="my-5">
+          <div class="text-xs font-bold my-2">Colour </div>
+          <span class="flex justify-around p-1 border-b">
+              <label class="text-xs ">Fill</label>
+              <input class="w-5 h-5" type="color" [(ngModel)]="color" (ngModelChange)="color$.next($event)"/>
+          </span>
+        </div>
+        <div class="">
+          <button (click)="refreshStage()">Refresh</button>
+        </div>
+
+    </div>
+    <!-- shapes -->
+    <div class="absolute left-20 p-2 m-3 rounded border bg-white z-50" *ngIf="isShapeDisplay" >
+      <button class="bg-transparent hover focus:outline-none absolute right-0 top-2 mb-3" (click)="toggle()">
+        <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="times"
+          class="w-2 mr-4 mb-2" role="img" xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 352 512">
+          <path fill="currentColor"
+            d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z">
+          </path>
+        </svg>
+      </button>
+      <div class="p-3" *ngFor="let shape of shapes">
+          <button (click)="createShape(shape.name)">
+            <img class="w-8" [src]="shape.image" [alt]="shape.name">
+          </button>
+      </div>
+    </div>
+    <!-- images -->
+    <div class="absolute left-20 p-2 m-3 h-[36rem]  rounded border bg-white z-50" *ngIf="isImageDisplay" >
+      <button class="bg-transparent hover focus:outline-none absolute right-0 top-2 mb-3 p-2" (click)="toggleImage()">
+        <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="times"
+          class="w-2 mr-4 mb-2" role="img" xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 352 512">
+          <path fill="currentColor"
+            d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z">
+          </path>
+        </svg>
+      </button>
+      <div class="flex flex-wrap w-44 mt-2 overflow-y-scroll h-[16rem]">
+          <button class="m-2 w-16" *ngFor="let image of images;  let i = index" (click)="createImage(i, images)">
+            <img class="w-14" [src]="image.image" [alt]="image.name">
+          </button>
+          
+      </div>
+      <div class="flex flex-wrap w-44 mt-2 overflow-y-scroll h-[16rem]">
+        <button class="m-2 w-16" *ngFor="let image of emojis;  let i = index" (click)="createImage(i, emojis)">
+          <img class="w-14" [src]="image.image" [alt]="image.name">
+        </button>
+        
+    </div>
+    </div>
+    <!-- menu -->
+    <div id="menu" class="hidden absolute z-50 border bg-gray-100">
+        <div class="flex flex-col p-1 ">
+            <button class="hover:bg-gray-300 p-1" (click)="bringToFront()">Bring to Front</button>
+            <button class="hover:bg-gray-300 p-1" (click)="sendToBack()">Send to Back</button>
+        </div>
+    </div>
+    <!-- canvas -->
+    <div id="container" class="bg-gray-100"></div>
+    <div id="preview" class="absolute top-20 right-8 border"></div>
+</section>

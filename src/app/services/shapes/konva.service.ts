@@ -1,126 +1,61 @@
 import {  Injectable } from '@angular/core';
-import { Line } from 'konva/lib/shapes/Line';
-import { BehaviorSubject } from 'rxjs';
 import Konva from 'konva';
-
 
 @Injectable({
   providedIn: 'root'
 })
 export class KonvaService {
-  // brushSize!: number;
-  // brushOpacity!: number;
-
+  
   public constructor(){}
-  public createCircle(stage: any, layer: any, previewStage: any, previewLayer: any, transformer: any, menuNode: any, color: any, io:any) {
+
+  public createCircle(stage: any, layer: any, transformer: any, menuNode: any, color: any, io: any): void {
     const circle = new Konva.Circle({
       x: 250,
       y: 250,
-      radius: 70,
+      radius: 45,
       fill: color,
       stroke: 'black',
       strokeWidth: 1,
       draggable: true,
       name: 'circle' + Math.random(),
       isSelected: true
-    });    
+    });
   
     circle.on('mouseover', () => {
       transformer.nodes([circle]);
-      io.emit('updates', transformer.nodes([circle]) );
+      layer.draw();
     });
   
     circle.on('click', (e) => {
       e.target.draggable(true);
       menuNode?.classList.add('hidden');
-      io.emit('updates', e);
+      layer.draw();
     });
-  
-    stage.on('click', (e: { evt: { clientX: any; clientY: any; }; }) => {
-      const clickPos = {
-        x: e.evt.clientX,
-        y: e.evt.clientY
-      };
-      
-      if (!circle.intersects(clickPos)) {
-        transformer.nodes([]);
-        return;
-      }
+        
+    // Emit the initial state of the circle to all clients
+    io.emit('createCircle', {
+      name: circle.attrs.name,
+      x: circle.attrs.x,
+      y: circle.attrs.y,
+      radius: circle.attrs.radius,
+      fill: circle.attrs.fill,
+      stroke: circle.attrs.stroke,
+      strokeWidth: circle.attrs.strokeWidth,
+      draggable: circle.attrs.draggable,
+      isSelected: circle.attrs.isSelected,
+      scaleX: circle.attrs.scaleX,
+      scaleY: circle.attrs.scaleY,
+      rotation: circle.attrs.rotation,
+    });
 
-      io.emit('updates', e);
-    });
-  
-    layer.add(circle);
-  
-    stage.add(layer);
-    layer.draw();
-  
-    io.emit('data', stage);
-    io.on('updates', (data: any) => {
-      // Update the stage using the received data      
-      stage = Konva.Node.create(JSON.parse(data), '#container');
-      //layer = stage.getLayers()[0]; 
-      console.log(stage);
-    });
   }
-  
-  
-  // public createCircle(stage: any, layer: any, previewStage: any, previewLayer: any, transformer: any, menuNode: any, color: any, io:any) {
-  //   const circle = new Konva.Circle({
-  //       x: 250,
-  //       y: 250,
-  //       radius: 70,
-  //       fill: color,
-  //       stroke: 'black',
-  //       strokeWidth: 1,
-  //       draggable: true,
-  //       name: 'circle' + Math.random(),
-  //       isSelected: true
-  //   });    
 
-  //   circle.on('mouseover ', () => {
-  //       transformer.nodes([circle]);
-  //   });
-
-  //   circle.on('click', (e) => {
-  //     e.target.draggable(true);
-  //     menuNode?.classList.add('hidden');
-  //   });
-
-  //   stage.on('click', (e: { evt: { clientX: any; clientY: any; }; }) => {
-      
-  //     const clickPos = {
-  //       x: e.evt.clientX,
-  //       y: e.evt.clientY
-  //     };
-      
-  //     if (!circle.intersects(clickPos)) {
-  //         transformer.nodes([]);
-  //         return;
-  //     }
-
-  //     });
-
-  //   layer.add(circle);
-
-  //   stage.add(layer);
-  //   layer.draw();
-
-  //   // Add circle to preview layer
-  //   previewLayer.add(circle.clone());
-  //   previewStage.add(previewLayer);
-  //   previewLayer.draw();
-
-  //   io.emit('canvas-update', stage.toJSON());
-    
-  // }
-
-  public createRectangle(stage: any, layer: any, previewStage: any, previewLayer: any, transformer: any, color: any) {
+  public createRectangle(stage: any, layer: any, transformer: any, color: any, io: any): void {
     const rect = new Konva.Rect({
-        x: 50,
-        y: 50,
-        width: 200,
-        height: 100,
+        x: 250,
+        y: 250,
+        width: 120,
+        height: 60,
         fill: color,
         stroke: 'black',
         strokeWidth: 1,
@@ -148,34 +83,30 @@ export class KonvaService {
 
     });
 
-    stage.on('click', (e: { evt: { clientX: any; clientY: any; }; }) => {
-      const clickPos = {
-        x: e.evt.clientX,
-        y: e.evt.clientY
-      };
-      
-      if (!rect.intersects(clickPos)) {
-          transformer.detach();
-      }
-      });
-
-    layer.add(rect);
-    stage.add(layer);
-    layer.draw();
-
-    // Add circle to preview layer
-    previewLayer.add(rect.clone());
-    previewStage.add(previewLayer);
-    previewLayer.draw();
-  
+    // Emit the initial state of the rect
+     io.emit('createRect', {
+        name: rect.attrs.name,
+        x: rect.attrs.x,
+        y: rect.attrs.y,
+        width: rect.attrs.width,
+        height: rect.attrs.height,
+        fill: rect.attrs.fill,
+        stroke: rect.attrs.stroke,
+        strokeWidth: rect.attrs.strokeWidth,
+        draggable: rect.attrs.draggable,
+        isSelected: rect.attrs.isSelected,
+        scaleX: rect.attrs.scaleX,
+        scaleY: rect.attrs.scaleY,
+        rotation: rect.attrs.rotation
+    });
   }
 
-  public createSquare(stage: any, layer: any, previewStage: any, previewLayer: any, transformer: any, color: any) {
+  public createSquare(stage: any, layer: any, transformer: any, color: any, io: any): void {
     const square = new Konva.Rect({
-        x: 150,
-        y: 150,
-        width: 100,
-        height: 100,
+        x: 250,
+        y: 250,
+        width: 75,
+        height: 75,
         fill: color,
         stroke: 'black',
         strokeWidth: 1,
@@ -188,72 +119,71 @@ export class KonvaService {
         transformer.nodes([square]);;
     });
 
-    stage.on('click', (e: { evt: { clientX: any; clientY: any; }; }) => {
-      const clickPos = {
-        x: e.evt.clientX,
-        y: e.evt.clientY
-      };
-      
-      if (!square.intersects(clickPos)) {
-          transformer.detach();
-      }
-      });
-
-    layer.add(square);
-    stage.add(layer);
-    transformer.attachTo(square);
-    layer.draw();
-
-   // Add square to preview layer
-   previewLayer.add(square.clone());
-   previewStage.add(previewLayer);
-   previewLayer.draw();
+  
+    // Emit the initial state of the rect
+    io.emit('createRect', {
+        name: square.attrs.name,
+        x: square.attrs.x,
+        y: square.attrs.y,
+        width: square.attrs.width,
+        height: square.attrs.height,
+        fill: square.attrs.fill,
+        stroke: square.attrs.stroke,
+        strokeWidth: square.attrs.strokeWidth,
+        draggable: square.attrs.draggable,
+        isSelected: square.attrs.isSelected,
+        scaleX: square.attrs.scaleX,
+        scaleY: square.attrs.scaleY,
+        rotation: square.attrs.rotation
+  });
    
   }
 
-  public createLine(stage: any, layer: any, previewStage: any, previewLayer: any, transformer: any, color: any) {
+  public createLine(stage: any, layer: any, transformer: any, color: any, io: any): void {
     const line = new Konva.Line({
         points: [100, 0, 100, 100],
-        stroke: color,
+        stroke: 'black',
         strokeWidth: 3,
         draggable: true,
         name: 'line' + Math.random(), 
         isSelected: true
     }); 
 
+    transformer.enabledAnchors(['top-left', 'top-right', 'bottom-left', 'bottom-right']);
     line.on('mouseover ', () => {
-        transformer.nodes([line]);;
-    });
+      const isVertical = line.points()[1] !== line.points()[3]; // Check if line is vertical
 
-    stage.on('click', (e: { evt: { clientX: any; clientY: any; }; }) => {
-      const clickPos = {
-        x: e.evt.clientX,
-        y: e.evt.clientY
-      };
-      
-      if (!line.intersects(clickPos)) {
-          transformer.detach();
+      if (isVertical) {
+        transformer.enabledAnchors(['top-center', 'bottom-center']);
+      } else {
+        transformer.enabledAnchors(['middle-left', 'middle-right']);
       }
-      });
+        transformer.nodes([line]);
+        
+    });
  
-    layer.add(line);
-    stage.add(layer);
-    layer.draw();
-
-    // Add line to preview layer
-    previewLayer.add(line.clone());
-    previewStage.add(previewLayer);
-    previewLayer.draw();
+    io.emit('createLine', {
+        name: line.attrs.name,
+        points: line.attrs.points,
+        fill: line.attrs.fill,
+        stroke: line.attrs.stroke,
+        strokeWidth: line.attrs.strokeWidth,
+        draggable: line.attrs.draggable,
+        isSelected: line.attrs.isSelected,
+        scaleX: line.attrs.scaleX,
+        scaleY: line.attrs.scaleY,
+        rotation: line.attrs.rotation
+    });
   
   }
  
-  public createArrow(stage: any, layer: any, previewStage: any, previewLayer: any, transformer: any, color: any) {
+  public createArrow(stage: any, layer: any, transformer: any, color: any, io: any): void {
     const arrow = new Konva.Arrow({
       x: 200,
       y: 100,
       points: [0, 0,  100,  100],
       pointerLength: 20,
-      pointerWidth: 20,
+      pointerWidth: 18,
       fill: color,
       stroke: 'black',
       strokeWidth: 2,
@@ -267,30 +197,26 @@ export class KonvaService {
 
     });
 
-    stage.on('click', (e: { evt: { clientX: any; clientY: any; }; }) => {
-      const clickPos = {
-        x: e.evt.clientX,
-        y: e.evt.clientY
-      };
-      
-      if (!arrow.intersects(clickPos)) {
-          transformer.detach();
-      }
-      });
+    io.emit('createArrow', {
+        name: arrow.attrs.name,
+        points: arrow.attrs.points,
+        pointerWidth: arrow.attrs.pointerWidth,
+        pointerLength: arrow.attrs.pointerLength,
+        fill: arrow.attrs.fill,
+        stroke: arrow.attrs.stroke,
+        strokeWidth: arrow.attrs.strokeWidth,
+        draggable: arrow.attrs.draggable,
+        isSelected: arrow.attrs.isSelected,
+        scaleX: arrow.attrs.scaleX,
+        scaleY: arrow.attrs.scaleY,
+        rotation: arrow.attrs.rotation
+    });
 
-    layer.add(arrow);
-    stage.add(layer);
-    layer.draw();
-
-    // Add arrow to preview layer
-    previewLayer.add(arrow.clone());
-    previewStage.add(previewLayer);
-    previewLayer.draw();
   }
 
-  public createText(stage: any, layer: any, previewStage: any, previewLayer: any, transformer: any){
+  public createText(stage: any, layer: any, transformer: any, io: any): void {
     const textNode = new Konva.Text({
-      text: 'Add text here',
+      text: 'Add some text here',
       x: 50,
       y: 80,
       fontSize: 20,
@@ -299,7 +225,6 @@ export class KonvaService {
       name: 'text' + Math.random()
     });
 
-    layer.add(textNode);
 
     textNode.on('transform', function () {
       // reset scale, so only with is changing by transformer
@@ -312,89 +237,23 @@ export class KonvaService {
 
     layer.add(transformer);
 
-    textNode.on('dblclick dbltap', () => {
-      // hide text node and transformer:
-      textNode.hide();
-      transformer.hide();
-      
-      // create textarea over canvas with absolute position
-      // first we need to find position for textarea
-      // how to find it?
-      
-      // at first lets find position of text node relative to the stage:
-      const textPosition = textNode.absolutePosition();
-      
-      // so position of textarea will be the sum of positions above:
-      const areaPosition = {
-      x: stage.container().offsetLeft + textPosition.x,
-      y: stage.container().offsetTop + textPosition.y,
-      };
-      
-      // create textarea and style it
-      const textarea = document.createElement('textarea');
-      document.body.appendChild(textarea);
-      
-      // apply many styles to match text on canvas as close as possible
-      // remember that text rendering on canvas and on the textarea can be different
-      // and sometimes it is hard to make it 100% the same. But we will try...
-      textarea.value = textNode.text();
-      textarea.style.position = 'absolute';
-      textarea.style.top = areaPosition.y + 'px';
-      textarea.style.left = areaPosition.x + 'px';
-      textarea.style.width = textNode.width() - textNode.padding() * 2 + 'px';
-      textarea.style.height =
-      textNode.height() - textNode.padding() * 2 + 5 + 'px';
-      textarea.style.fontSize = textNode.fontSize() + 'px';
-      textarea.style.border = 'none';
-      textarea.style.padding = '0px';
-      textarea.style.margin = '0px';
-      textarea.style.overflow = 'hidden';
-      textarea.style.background = 'none';
-      textarea.style.outline = 'none';
-      textarea.style.resize = 'none';
-      //textarea.style.lineHeight = textNode.lineHeight();
-      textarea.style.fontFamily = textNode.fontFamily();
-      textarea.style.transformOrigin = 'left top';
-      textarea.style.textAlign = textNode.align();
-      textarea.style.color = textNode.fill();
-      const rotation = textNode.rotation();
-      let transform = '';
-      if (rotation) {
-      transform += 'rotateZ(' + rotation + 'deg)';
-      }
-          textarea.style.transform = transform;
-          textarea.style.height = 'auto';
-      
-          textarea.focus();
-      
-          textarea.addEventListener('keydown', function (e) {
-            // hide on enter key
-            if (e.keyCode === 13) {
-                textNode.show();
-                transformer.show();
-                textNode.text(textarea.value);
-                layer.draw();
-                document.body.removeChild(textarea);
-              }
-          });
-          textarea.addEventListener('input', function () {
-            textarea.style.height = 'auto';
-            textarea.style.height = textarea.scrollHeight + 'px';
-          });
-
-          textarea.addEventListener('mouseleave',() => {
-
-          } )
+    io.emit('createText', {
+      name: textNode.attrs.name,
+      x: textNode.attrs.x,
+      y: textNode.attrs.y,
+      fontSize: textNode.attrs.fontSize,
+      text: textNode.attrs.text,
+      width: textNode.attrs.width,
+      draggable: textNode.attrs.draggable,
+      isSelected: textNode.attrs.isSelected,
+      scaleX: textNode.attrs.scaleX,
+      scaleY: textNode.attrs.scaleY,
+      rotation: textNode.attrs.rotation
     });
-
-    // Add text to preview layer
-    previewLayer.add(textNode.clone());
-    previewStage.add(previewLayer);
-    previewLayer.draw();
     
   }
 
-  public createPen(stage: any, layer: any, lastLine: any, mode: any, isPaint: any) {
+  public createPen(stage: any, layer: any, lastLine: any, mode: any, isPaint: any, io: any): void {
     mode = 'rectangle'; 
       stage.on('mousedown touchstart', (e: any) => {
         isPaint = true;
@@ -426,13 +285,13 @@ export class KonvaService {
         const pos = stage.getPointerPosition();
         const newPoints = lastLine.points().concat([pos!.x, pos!.y]);
         lastLine.points(newPoints);
+
+        io.emit('draw', { points: newPoints});
       });
-  
-    
+
   }
 
-  public createErase(stage: any, layer: any, lastLine: any, mode: any, isPaint: any) {
-    
+  public createErase(stage: any, layer: any, lastLine: any, mode: any, isPaint: any, io: any): void { 
     mode = 'rectangle'; 
       stage.on('mousedown touchstart', (e: any) => {
         isPaint = true;
@@ -445,7 +304,7 @@ export class KonvaService {
           lineJoin: 'round',
           points: [pos!.x, pos!.y, pos!.x, pos!.y],
         });
-        layer.add(lastLine);
+        //layer.add(lastLine);
       });
   
       stage.on('mouseup touchend', () => {
@@ -462,11 +321,12 @@ export class KonvaService {
         const pos = stage.getPointerPosition();
         const newPoints = lastLine.points().concat([pos!.x, pos!.y]);
         lastLine.points(newPoints);
+        io.emit('erase', { points: newPoints});
       });
   
       stage.on('click', (e: any) => {
         if (mode === 'erase') {
-          stage.container().style.cursor = 'url(http://www.rw-designer.com/cursor-extern.php?id=72976), default';
+          stage.container().classList.add('eraser-cursor');
           const shape = e.target;
           shape.destroy();
           layer.draw();
@@ -476,29 +336,5 @@ export class KonvaService {
       });
     
   }
-  // brush(pos: any, size: any, color: string, opacity: number) {
-  //   this.brushSize = size;
-  //   this.brushOpacity = opacity;
-  //   return new Line({
-  //     stroke: color,
-  //     strokeWidth: size,
-  //     globalCompositeOperation: 'source-over',
-  //     points: [pos.x, pos.y, pos.x, pos.y],
-  //     lineCap: 'round',
-  //     lineJoin: 'round',
-  //     opacity: opacity,
-  //     tension: 0
-  //   });
-  // }
 
-  // erase(pos: any, size: any) {
-  //   return new Line({
-  //     stroke: '#ffffff',
-  //     strokeWidth: size,
-  //     globalCompositeOperation: 'destination-out',
-  //     points: [pos.x, pos.y, pos.x, pos.y],
-  //     lineCap: 'round',
-  //     lineJoin: 'round'
-  //   });
-  // }
 }
